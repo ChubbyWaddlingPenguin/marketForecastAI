@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<link rel="stylesheet" href="style.css">-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Stock Visualizer</title>
+</head>
+
+<body>
+<h2>Interative Stock Visualizer</h2>
+<br>
+
+<label for="ticker-input">Enter Symbol:</label>
+<input type="text" id="ticker-input">
+<input type="button" value="submit" id="submit-btn">
+<br>
+
+<div id="graph-area" style="height:80%; width:80%;">
+<canvas id="myChart"></canvas>
+</div>
+<br>
+
+<script>
+    $(document).ready(function(){
+        // Runs after Dom loads
+        var requestData = {
+            arg1: "TQQQ"
+        };
+        $.ajax({
+            type: "POST",
+            url: "callJavaAPI.php",
+            data: requestData,
+            success: function(data, status) {
+                if (status === "success") {
+                    alert('Java program executed successfully.');
+                } else {
+                    alert('Error executing Java program.');
+                }
+            },
+            error: function() {
+                alert('Error executing Java program.');
+            }
+        });
+        
+        $.ajax({
+              type: "POST",
+              url: "/get_stock_data/",
+              data: {
+                 'ticker': 'TQQQ',
+              },
+              success: function (res, status) {
+                // TQQQ's price in res
+                var tickerDisplay = requestData.arg1;
+                var graphTitle = tickerDisplay + ' (data for the trailing 5 trading days at 5 mins intervals)'
+
+                var priceSeries = res['low_prices'];
+                for (var i = 0; i < priceSeries.length; i++) {
+                    priceSeries[i] = parseFloat(priceSeries[i]);
+                }
+                var daily_adjusted_close = [];
+                var dates = res['timestamps'];
+
+                // keep 500 data points
+                daily_adjusted_close.reverse().slice(500);
+                dates.reverse().slice(500);
+
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                type: 'line',
+                    data: {
+                        labels: dates.slice(-500),
+                        datasets: [
+                            {
+                                label: 'Daily Adjusted Close',
+                                data: daily_adjusted_close.slice(-500),
+                                backgroundColor: [
+                                    'green',
+                                ],
+                                borderColor: [
+                                    'green',
+                                ],
+                                borderWidth: 1
+                            },
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                //beginAtZero: false
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                            position: 'top',
+                            },
+                            title: {
+                            display: true,
+                            text: graphTitle
+                            }
+                        }
+                    }
+                });
+
+              }
+        });
+    });
+
+    $('#submit-btn').click(function() {
+        // new ticker from user
+        var requestData = {
+            arg1: $('#ticker-input').val()
+        };
+        $.ajax({
+            type: "POST",
+            url: "callJavaAPI.php",
+            data: requestData,
+            success: function(data, status) {
+                if (status === "success") {
+                    alert('Java program executed successfully.');
+                } else {
+                    alert('Error executing Java program.');
+                }
+            },
+            error: function() {
+                alert('Error executing Java program.');
+            }
+        });
+        
+        $.ajax({
+              type: "POST",
+              url: "/get_stock_data/",
+              data: {
+                 'ticker': 'TQQQ',
+              },
+              success: function (res, status) {
+                // TQQQ's price in res
+                var tickerDisplay = requestData.arg1;
+                var graphTitle = tickerDisplay + ' (data for the trailing 5 trading days at 5 mins intervals)'
+
+                var priceSeries = res['low_prices'];
+                for (var i = 0; i < priceSeries.length; i++) {
+                    priceSeries[i] = parseFloat(priceSeries[i]);
+                }
+                var daily_adjusted_close = [];
+                var dates = res['timestamps'];
+
+                // keep 500 data points
+                daily_adjusted_close.reverse().slice(500);
+                dates.reverse().slice(500);
+                
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                type: 'line',
+                    data: {
+                        labels: dates.slice(-500),
+                        datasets: [
+                            {
+                                label: 'Daily Adjusted Close',
+                                data: daily_adjusted_close.slice(-500),
+                                backgroundColor: [
+                                    'green',
+                                ],
+                                borderColor: [
+                                    'green',
+                                ],
+                                borderWidth: 1
+                            },
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                //beginAtZero: false
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                            position: 'top',
+                            },
+                            title: {
+                            display: true,
+                            text: graphTitle
+                            }
+                        }
+                    }
+                });
+
+              }
+        });
+    });
+
+</script>
+
+</body>
+</html>
