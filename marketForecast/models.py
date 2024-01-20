@@ -2,7 +2,7 @@ from django.db import models
 
 class MyData(models.Model):
     symbol = models.CharField(max_length=10)
-    timestamp = models.DateTimeField()
+    timestamp = models.CharField(max_length=20)
     open = models.CharField(max_length=15)
     high = models.CharField(max_length=15)
     low = models.CharField(max_length=15)

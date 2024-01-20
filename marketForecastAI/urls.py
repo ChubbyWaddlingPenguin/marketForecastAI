@@ -21,5 +21,6 @@ import marketForecast.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", marketForecast.views.home),
-    path('get_stock_data/', marketForecast.views.get_stock_data)
+    path('get_stock_data/', marketForecast.views.get_stock_data),
+    path('runJavaAPI/', marketForecast.views.runJavaAPI)
 ]

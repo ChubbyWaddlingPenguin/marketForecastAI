@@ -1,10 +1,7 @@
-package arthur;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,7 +11,7 @@ import java.util.Collections;
 public class Main {
     public static void main(String[] args) {
         //args format: argument: value (future implementation)
-        String APIurl = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" + args[0] + "&interval=5min&month=2023-12&outputsize=full&datatype=csv&apikey=";
+        String APIurl = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" + args[0] + "&interval=5min&month=2023-12&outputsize=full&datatype=csv&apikey=ID65LPK90VSEGPLZ";
         String databaseURL = "jdbc:sqlite:output.db";
 
         try {
@@ -33,9 +30,16 @@ public class Main {
                 Connection dbConnection = DriverManager.getConnection(databaseURL);
 
                 String headerline = in.readLine();
+                if (headerline.equals("{}")) {
+                    System.out.print("API Error");
+                    System.exit(1);
+                }
+                System.out.print(headerline);
                 String[] columnTitles = ("symbol," + headerline).split(",");
 
-                StringBuilder sqlStatement = new StringBuilder("CREATE TABLE IF NOT EXISTS OUTPUT (");
+                StringBuilder sqlStatement = new StringBuilder("DROP TABLE IF EXISTS OUTPUT");
+                dbConnection.createStatement().executeUpdate(sqlStatement.toString());
+                sqlStatement = new StringBuilder("CREATE TABLE IF NOT EXISTS OUTPUT (");
                 sqlStatement.append("id INTEGER PRIMARY KEY AUTOINCREMENT, ");
                 for (String columnTitle : columnTitles) {
                     sqlStatement.append(columnTitle).append(" TEXT, ");
