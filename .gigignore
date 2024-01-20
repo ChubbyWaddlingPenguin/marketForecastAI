@@ -1,1 +1,3 @@
-/ignore
+.jar
+.db
+.class
